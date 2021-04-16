@@ -23,12 +23,45 @@ function orderReducer(state = initialState, action : any) {
                 newOrder
             ]
         };
-        case OrderData.UPDATE_ORDER:
-            const orderPayload : OrderData.Order = action.payload;
+        case OrderData.UPDATE_ORDER_NAME: {
+                const orderPayload : OrderData.OrderNameUpdate = action.payload;
+
+                const orderToEdit = state.orders.find( order => order.ID === orderPayload.ID );
+                if ( !orderToEdit ) {
+                    return state;
+                }
+
+                const newOrder = {
+                    ...orderToEdit,
+                    Name : orderPayload.Name
+                }
+
+                return {
+                    ...state,
+                    orders : state.orders.filter( order => orderPayload.ID !== order.ID ).concat( newOrder )
+                };
+            }
+
+        
+        case OrderData.UPDATE_ORDER_PRICE: {
+            const orderPayload : OrderData.OrderPriceUpdate = action.payload;
+
+            const orderToEdit = state.orders.find( order => order.ID === orderPayload.ID );
+            if ( !orderToEdit ) {
+                return state;
+            }
+
+            const newOrder = {
+                ...orderToEdit,
+                Price : orderPayload.Price
+            }
+
             return {
                 ...state,
-                orders : state.orders.filter( order => orderPayload.ID !== order.ID ).concat( orderPayload )
+                orders : state.orders.filter( order => orderPayload.ID !== order.ID ).concat( newOrder )
             };
+        }
+            
 
         case OrderData.DELETE_ORDER:
             const orderPayloadID : string = action.payload;

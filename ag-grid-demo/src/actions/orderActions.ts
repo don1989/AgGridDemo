@@ -15,9 +15,16 @@ export const actions = {
         }
     },
 
-    updateOrder( order : OrderData.Order ) {
+    updateOrderName( order : OrderData.OrderNameUpdate ) {
         return {
-            type : OrderData.UPDATE_ORDER,
+            type : OrderData.UPDATE_ORDER_NAME,
+            payload : order
+        }
+    },
+
+    updateOrderPrice( order : OrderData.OrderPriceUpdate ) {
+        return {
+            type : OrderData.UPDATE_ORDER_PRICE,
             payload : order
         }
     }

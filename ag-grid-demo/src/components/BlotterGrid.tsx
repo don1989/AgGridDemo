@@ -1,4 +1,4 @@
-import { ColDef, GridApi, GridReadyEvent, RefreshCellsParams, RowNode } from "ag-grid-community";
+import { ColDef, GridApi, GridReadyEvent, RefreshCellsParams, RowDataUpdatedEvent, RowNode } from "ag-grid-community";
 import { AgGridReact } from "ag-grid-react/lib/agGridReact";
 
 import "ag-grid-community/dist/styles/ag-grid.css";
@@ -17,58 +17,61 @@ interface Props {
 class BlotterGrid extends React.Component<Props, {}> {
 
     public gridApi : GridApi | null = null;
+    public prevRowData : Order[] = [];
 
     componentDidUpdate( prevProps : Props ) {
-        this.flashAndRefreshRowsIfChanged(prevProps);
+        this.prevRowData = prevProps.rowData;
     }
 
-    flashAndRefreshRowsIfChanged ( prevProps : Props ) {
+    flashAndRefreshRowsIfChanged() {
         if ( this.gridApi ) {
-            const rowNodes : RowNode[] = [];
+            const rowNodesToFlashGreen : RowNode[] = [];
+            const rowNodesToFlashRed : RowNode[] = [];
 
-            // this.gridApi.setRowData( this.props.rowData );
             this.props.rowData.forEach( row => {
-                const oldOrder = prevProps.rowData.find( prevOr => prevOr.ID === row.ID );
+                const oldOrder = this.prevRowData.find( prevOr => prevOr.ID === row.ID );
 
                 const rowNode = this.gridApi?.getRowNode( row.ID )
-                if ( oldOrder ) {
-                    if (  oldOrder.Name !== row.Name || oldOrder.Price !== row.Price ) {
-                        if ( rowNode ){
-                            rowNodes.push( rowNode );
+
+                if ( rowNode ) {
+                    if ( oldOrder ) {
+                        if ( oldOrder.Name !== row.Name ){ // Flash green if the name changes
+                            rowNodesToFlashGreen.push( rowNode );
+                        }
+                        else if ( oldOrder.Price !== row.Price ) { // TODO: flash red if the name changes ... HOW???
+                            rowNodesToFlashRed.push( rowNode );
                         }
                     }
-                }
-                else {
-                    if ( rowNode ){
-                        rowNodes.push( rowNode );
+                    else {
+                        rowNodesToFlashGreen.push( rowNode );
                     }
-                }
-
-                // This is the problem. RowNode is null when adding a new row.
-                // This won't flash unless I explicitly use this.gridApi.setRowData( this.props.rowData ) at the top
-                if ( !rowNode ) {
-                    console.log('rowNode is null for row', row.ID)
                 }
             })
 
+            // By default, this will flash green...
             const flashParams = {
-                rowNodes,
+                rowNodes : rowNodesToFlashGreen,
                 flashDelay: 5000,
                 fadeDelay: 3000,
             }
             this.gridApi.flashCells(flashParams);
+            // TODO: How do I get the rowNodesToFlashRed to actually flash red??
 
             const refreshParams : RefreshCellsParams = {
                 force : true,
                 suppressFlash : false,
-                rowNodes,
+                rowNodes : rowNodesToFlashGreen.concat(rowNodesToFlashRed),
             }
-            this.gridApi.refreshCells(refreshParams);
+            this.gridApi.refreshCells(refreshParams);   
         }
     }
 
     onGridReady = (params : GridReadyEvent) => {
         this.gridApi = params.api;
+    }
+
+    onRowDataUpdated = (event: RowDataUpdatedEvent) => {
+        this.flashAndRefreshRowsIfChanged();
     }
 
     render() {
@@ -82,6 +85,7 @@ class BlotterGrid extends React.Component<Props, {}> {
                         columnDefs={this.props.columnDefs}
                         rowData={this.props.rowData}
                         onGridReady={this.onGridReady}
+                        onRowDataUpdated={this.onRowDataUpdated}
                     />
                 </div>
         )

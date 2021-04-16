@@ -54,11 +54,19 @@ class Blotter extends React.Component<Props & StateProps, State> {
         })
     }
 
-    updateOrder = () => {
+    updateOrderName = () => {
         this.props.dispatch(
-            actions.updateOrder({
+            actions.updateOrderName({
                 ID : this.state.updateOrderID,
-                Name: this.randomString(),
+                Name: this.randomString()
+            })
+        );
+    }
+
+    updateOrderPrice = () => {
+        this.props.dispatch(
+            actions.updateOrderPrice({
+                ID : this.state.updateOrderID,
                 Price : Math.random()
             })
         );
@@ -82,7 +90,9 @@ class Blotter extends React.Component<Props & StateProps, State> {
             <div style={{height: '500px', width: '650px'}}>
                 <button onClick={ this.newOrder }>New Order</button>
 
-                <button onClick={ this.updateOrder }>Update Order ID</button>
+                <button onClick={ this.updateOrderName }>Update Name for ID</button>
+                <button onClick={ this.updateOrderPrice }>Update Price ID</button>
+
                 <input type="text" value={this.state.updateOrderID} onChange={this.onChangeUpdateOrder}/>
 
                 <BlotterGrid 
