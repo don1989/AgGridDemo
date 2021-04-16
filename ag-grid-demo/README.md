@@ -1,6 +1,6 @@
 # AgGridDemo
 
-## To reproduce the flashing row issue:
+## Scenario for flashing rows with different colours based on data:
 
 Open up the project in Visual Studio Code
 
@@ -8,27 +8,16 @@ Open up the project in Visual Studio Code
 
 cd ag-grid-demo
 
-npm install (this will install ag-grid-community@25.0.1)
-
 npm start
 
 
 ### In the browser:
 
-Select 'New Order'
+Select 'Update Name For ID'
 
-Notice that the new order is not flashed on screen.
+Notice the flash is the default green.
 
-Quit the app from VS code.
+Select 'Update Price ID
 
-### In the terminal:
+Notice here it flashes green, however I want it to flash red.
 
-npm install ag-grid-community@24.1.0 ag-grid-react@24.1.0
-
-npm start
-
-### In the browser:
-
-Select 'New Order'
-
-Notice that the flash is displayed in the new order.
